@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # HLCS - High-Level Consciousness System
+  # ============================================================================
+  hlcs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hlcs:latest
+    container_name: hlcs
+    ports:
+      - "4000:4000"  # gRPC (placeholder)
+      - "4001:4001"  # REST API (functional)
+    environment:
+      # SARAi MCP Server
+      - SARAI_MCP_URL=${SARAI_MCP_URL:-http://sarai-core:3000}
+      - SARAI_MCP_TIMEOUT=30
+      
+      # HLCS Server
+      - HLCS_GRPC_PORT=4000
+      - HLCS_REST_PORT=4001
+      - HLCS_MAX_WORKERS=10
+      
+      # Orchestration
+      - COMPLEXITY_THRESHOLD=${COMPLEXITY_THRESHOLD:-0.5}
+      - QUALITY_THRESHOLD=${QUALITY_THRESHOLD:-0.7}
+      - MAX_ITERATIONS=${MAX_ITERATIONS:-3}
+      - DEFAULT_TIMEOUT_SECONDS=30
+      
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_FORMAT=json
+      
+      # Monitoring
+      - METRICS_ENABLED=true
+      - METRICS_PORT=9090
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - ./.env:/app/.env
+    networks:
+      - sarai-network
+    depends_on:
+      - sarai-core
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ============================================================================
+  # SARAi MCP Server (prerequisite)
+  # ============================================================================
+  sarai-core:
+    image: sarai:core
+    container_name: sarai-core
+    ports:
+      - "3000:3000"
+    environment:
+      - MCP_ENABLED=true
+      - LOG_LEVEL=info
+    volumes:
+      - ./config/sarai:/app/config
+    networks:
+      - sarai-network
+    restart: unless-stopped
+    # Note: Este servicio se asume que existe
+    # Si no, comentar depends_on arriba y conectar manualmente
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  sarai-network:
+    name: sarai-network
+    driver: bridge
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  hlcs-logs:
+  hlcs-data:

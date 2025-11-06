@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package sarai.mcp;
+
+// ============================================================================
+// SARAi MCP Client Protocol
+// Client-side interface for consuming SARAi tools via MCP
+// ============================================================================
+
+service SaraiMCP {
+  // Call a tool (generic interface)
+  rpc CallTool(ToolCallRequest) returns (ToolCallResponse);
+  
+  // List available tools
+  rpc ListTools(ListToolsRequest) returns (ListToolsResponse);
+  
+  // Get resource (memory, knowledge, etc.)
+  rpc GetResource(ResourceRequest) returns (ResourceResponse);
+  
+  // Health check SARAi connectivity
+  rpc Ping(PingRequest) returns (PingResponse);
+}
+
+// ============================================================================
+// Tool Call Messages
+// ============================================================================
+
+message ToolCallRequest {
+  string tool_name = 1;           // e.g., "saul.respond", "vision.analyze"
+  map<string, string> parameters = 2;  // Tool parameters (JSON-serializable)
+  optional int32 timeout_seconds = 3;
+}
+
+message ToolCallResponse {
+  bool success = 1;
+  map<string, string> result = 2;     // Tool result (JSON-serializable)
+  optional string error = 3;
+  int64 latency_ms = 4;
+}
+
+// ============================================================================
+// Tool Discovery Messages
+// ============================================================================
+
+message ListToolsRequest {
+  optional string category = 1;       // Filter by category (vision, audio, rag, etc.)
+}
+
+message ListToolsResponse {
+  repeated Tool tools = 1;
+}
+
+message Tool {
+  string name = 1;                    // e.g., "saul.respond"
+  string description = 2;
+  string category = 3;                // vision, audio, rag, memory, skills
+  repeated Parameter parameters = 4;
+  bool available = 5;
+}
+
+message Parameter {
+  string name = 1;
+  string type = 2;                    // string, int, float, bool, bytes
+  bool required = 3;
+  optional string description = 4;
+}
+
+// ============================================================================
+// Resource Messages
+// ============================================================================
+
+message ResourceRequest {
+  string resource_uri = 1;            // e.g., "memory://conversations/session_123"
+}
+
+message ResourceResponse {
+  bool success = 1;
+  bytes data = 2;
+  string content_type = 3;
+  optional string error = 4;
+}
+
+// ============================================================================
+// Health Check Messages
+// ============================================================================
+
+message PingRequest {
+  int64 timestamp = 1;
+}
+
+message PingResponse {
+  bool ok = 1;
+  int64 timestamp = 2;
+  int64 latency_ms = 3;
+}

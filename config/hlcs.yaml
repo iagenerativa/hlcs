@@ -1,0 +1,71 @@
+# Configuración HLCS (High-Level Consciousness System)
+# Versión: 1.0.0
+
+# SARAi MCP Server Configuration
+sarai_mcp:
+  enabled: true
+  base_url: "http://localhost:3000"
+  timeout: 30  # segundos
+  max_retries: 3
+  
+  # Tools a usar (deja vacío para usar todos los disponibles)
+  tools:
+    - saul.respond
+    - saul.synthesize
+    # - vision.analyze  # Descomentar cuando esté disponible
+    # - audio.transcribe
+    # - rag.search
+  
+  # Opciones de cache
+  cache:
+    enabled: true
+    tools_list_ttl: 300  # 5 minutos
+  
+  # Logging
+  logging:
+    level: INFO  # DEBUG, INFO, WARNING, ERROR
+    log_requests: true
+    log_responses: false  # Cuidado: puede ser verbose
+
+# Agente Configuration
+agent:
+  name: "HLCS-Agent"
+  version: "1.0.0"
+  
+  # Razonamiento
+  reasoning:
+    model: "gpt-4"  # o "claude-3", "local/llama3", etc.
+    temperature: 0.7
+    max_tokens: 2000
+  
+  # Planificación
+  planning:
+    enabled: true
+    max_steps: 10
+    timeout: 60  # segundos
+
+# LangGraph Configuration (si se usa)
+langgraph:
+  enabled: false
+  checkpointer: "memory"  # memory, sqlite, postgres
+  
+# CrewAI Configuration (si se usa)
+crewai:
+  enabled: false
+  verbose: true
+
+# Monitoreo
+monitoring:
+  prometheus:
+    enabled: false
+    port: 9090
+  
+  healthcheck:
+    enabled: true
+    interval: 30  # segundos
+
+# Desarrollo
+development:
+  debug: true
+  reload: false
+  mock_sarai: false  # Usar mock en lugar de servidor real

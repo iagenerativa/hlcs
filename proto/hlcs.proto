@@ -1,0 +1,177 @@
+syntax = "proto3";
+
+package hlcs;
+
+// ============================================================================
+// HLCS - High-Level Consciousness System API
+// API-first design for strategic orchestration
+// ============================================================================
+
+service HLCS {
+  // Process a query with intelligent orchestration
+  rpc ProcessQuery(QueryRequest) returns (QueryResponse);
+  
+  // Process query with streaming response (for long-running tasks)
+  rpc ProcessQueryStream(QueryRequest) returns (stream QueryStreamChunk);
+  
+  // Get system status and metrics
+  rpc GetStatus(StatusRequest) returns (StatusResponse);
+  
+  // List available capabilities
+  rpc ListCapabilities(CapabilitiesRequest) returns (CapabilitiesResponse);
+  
+  // Health check
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// ============================================================================
+// Query Processing Messages
+// ============================================================================
+
+message QueryRequest {
+  string query = 1;                    // Text query
+  optional string user_id = 2;         // User identifier
+  optional string session_id = 3;      // Session identifier
+  
+  // Multimodal inputs
+  optional string image_url = 4;       // Image URL (for vision)
+  optional string audio_url = 5;       // Audio URL (for transcription)
+  optional bytes image_data = 6;       // Image bytes (alternative to URL)
+  optional bytes audio_data = 7;       // Audio bytes (alternative to URL)
+  
+  // Context
+  map<string, string> context = 8;     // Additional context
+  
+  // Processing preferences
+  ProcessingOptions options = 9;
+}
+
+message ProcessingOptions {
+  optional float quality_threshold = 1;   // Min quality score (0.0-1.0)
+  optional int32 max_iterations = 2;      // Max refinement iterations
+  optional int32 timeout_seconds = 3;     // Processing timeout
+  optional bool enable_streaming = 4;     // Enable streaming response
+  optional string strategy = 5;           // Force strategy (simple/complex/multimodal)
+}
+
+message QueryResponse {
+  string result = 1;                      // Final result text
+  float quality_score = 2;                // Quality score (0.0-1.0)
+  float complexity = 3;                   // Complexity score
+  string strategy = 4;                    // Strategy used
+  string modality = 5;                    // Modality (text/multimodal)
+  int32 iterations = 6;                   // Refinement iterations
+  int64 processing_time_ms = 7;           // Processing time
+  
+  // Metadata
+  QueryMetadata metadata = 8;
+  
+  // Errors (if any)
+  repeated string errors = 9;
+  repeated string warnings = 10;
+}
+
+message QueryStreamChunk {
+  enum ChunkType {
+    STATUS = 0;           // Status update
+    PARTIAL_RESULT = 1;   // Partial result
+    FINAL_RESULT = 2;     // Final result
+    ERROR = 3;            // Error occurred
+  }
+  
+  ChunkType type = 1;
+  string content = 2;
+  optional QueryMetadata metadata = 3;
+}
+
+message QueryMetadata {
+  bool has_image = 1;
+  bool has_audio = 2;
+  bool research_done = 3;
+  bool vision_done = 4;
+  bool audio_done = 5;
+  
+  // Tool calls made
+  repeated ToolCall tool_calls = 6;
+}
+
+message ToolCall {
+  string tool_name = 1;     // e.g., "saul.respond", "vision.analyze"
+  int64 latency_ms = 2;     // Tool call latency
+  bool success = 3;         // Success status
+  optional string error = 4; // Error message if failed
+}
+
+// ============================================================================
+// Status & Monitoring Messages
+// ============================================================================
+
+message StatusRequest {
+  bool include_metrics = 1;
+  bool include_capabilities = 2;
+}
+
+message StatusResponse {
+  string status = 1;                    // "healthy", "degraded", "unhealthy"
+  string version = 2;                   // HLCS version
+  int64 uptime_seconds = 3;             // Uptime
+  
+  // Metrics
+  optional SystemMetrics metrics = 4;
+  
+  // SARAi connectivity
+  SaraiStatus sarai_status = 5;
+}
+
+message SystemMetrics {
+  int64 total_queries = 1;
+  int64 successful_queries = 2;
+  int64 failed_queries = 3;
+  float avg_processing_time_ms = 4;
+  float avg_quality_score = 5;
+  
+  // Breakdown by strategy
+  int64 simple_queries = 6;
+  int64 complex_queries = 7;
+  int64 multimodal_queries = 8;
+}
+
+message SaraiStatus {
+  bool connected = 1;
+  string endpoint = 2;
+  int64 latency_ms = 3;
+  repeated string available_tools = 4;
+}
+
+// ============================================================================
+// Capabilities Messages
+// ============================================================================
+
+message CapabilitiesRequest {
+  // Empty for now, reserved for future filtering
+}
+
+message CapabilitiesResponse {
+  repeated Capability capabilities = 1;
+}
+
+message Capability {
+  string name = 1;              // e.g., "vision_analysis", "rag_search"
+  string description = 2;
+  bool available = 3;           // Currently available
+  repeated string dependencies = 4;  // Required SARAi tools
+}
+
+// ============================================================================
+// Health Check Messages
+// ============================================================================
+
+message HealthCheckRequest {
+  // Empty for now
+}
+
+message HealthCheckResponse {
+  bool healthy = 1;
+  string message = 2;
+  int64 timestamp = 3;
+}
