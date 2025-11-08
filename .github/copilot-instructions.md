@@ -1,5 +1,28 @@
 # HLCS (High-Level Consciousness System) - AI Agent Instructions
 
+## 🚨 IMPORTANT: Migration in Progress
+
+**Status**: 🟡 sarai-agi component integration **AWAITING APPROVAL**
+
+HLCS v3.0 is undergoing architectural analysis for integrating components from sarai-agi. Before making changes to core systems, review:
+
+- **[docs/SARAI_AGI_MIGRATION_STATUS.md](../docs/SARAI_AGI_MIGRATION_STATUS.md)** - Current migration status
+- **[docs/MIGRATION_CONFLICT_ANALYSIS.md](../docs/MIGRATION_CONFLICT_ANALYSIS.md)** - Collision analysis
+- **[docs/ADR-001-MIGRATION-STRATEGY.md](../docs/ADR-001-MIGRATION-STRATEGY.md)** - Architecture decisions
+
+**Components with Migration Conflicts** (DO NOT modify without reviewing ADR-001):
+- ⚠️ `src/hlcs/metacognition/meta_consciousness.py` - Collision with IntegratedConsciousness v0.3
+- ⚠️ `src/hlcs/planning/strategic_planner.py` - Collision with Meta-Reasoner v0.2
+- ⚠️ `src/hlcs/memory/rag.py` - Partial collision with Active Learning v0.4
+
+**Safe to Extend** (No conflicts):
+- ✅ New emotion system (planned)
+- ✅ Monitoring & observability (planned)
+- ✅ REST API endpoints
+- ✅ Tests and documentation
+
+---
+
 ## Project Architecture
 
 HLCS v3.0 is an **autonomous orchestration layer** for SARAi AGI with three-tier intelligence system:

@@ -2,7 +2,8 @@
 
 **Version**: 3.0.0 (Autonomous Intelligence) 🧠  
 **API Protocol**: gRPC + REST (dual)  
-**Integration**: SARAi MCP Server + Phi4MiniAGI + Meta-Consciousness + Strategic Planning + Multi-Stakeholder SCI
+**Integration**: SARAi MCP Server + Phi4MiniAGI + Meta-Consciousness + Strategic Planning + Multi-Stakeholder SCI  
+**Migration Status**: 🟡 [sarai-agi integration pending approval](docs/SARAI_AGI_MIGRATION_STATUS.md)
 
 ---
 
@@ -464,6 +465,29 @@ pytest tests/test_e2e_integration.py -v -s
 - [ ] Fine-tuning pipeline integration
 - [ ] Multi-tenancy support
 - [ ] Distributed tracing (OpenTelemetry)
+
+---
+
+## 🔄 Migration Status
+
+**sarai-agi Component Integration**: 🟡 **AWAITING APPROVAL**
+
+HLCS v3.0 is undergoing architectural analysis for integrating advanced components from the sarai-agi project. Critical collisions identified, HYBRID APPROACH strategy proposed.
+
+**Key Documents**:
+- 📋 **[Migration Status](docs/SARAI_AGI_MIGRATION_STATUS.md)** - Quick overview
+- 🚨 **[Conflict Analysis](docs/MIGRATION_CONFLICT_ANALYSIS.md)** - Detailed collision analysis  
+- 📜 **[ADR-001](docs/ADR-001-MIGRATION-STRATEGY.md)** - Architecture Decision Record
+
+**Components Under Review**:
+- ✅ Emotion System (safe to migrate)
+- ✅ Monitoring & Observability (upgrade)
+- ⚠️ Meta-Reasoner (coexist with Planning)
+- ⚠️ Active Learning (coexist with RAG)
+- 🔴 LoRA Trainer (defer to v0.4)
+- 🔴 IntegratedConsciousness (defer merge to v0.4)
+
+**Next Step**: 🔴 Architecture Alignment Meeting (BLOCKER)
 
 ---
 
