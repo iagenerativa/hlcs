@@ -7,8 +7,8 @@
 ```bash
 cd ~/hlcs
 
-# Create virtual environment (Python 3.12+)
-python3.12 -m venv .venv
+# Create virtual environment (Python 3.11+ required, 3.12+ recommended)
+python3.11 -m venv .venv  # or python3.12 for best performance
 source .venv/bin/activate
 
 # Install dependencies

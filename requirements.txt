@@ -18,6 +18,13 @@ aiohttp==3.9.1
 python-dotenv==1.0.0
 pyyaml==6.0.1
 
+# RAG & Memory (ChromaDB + LangChain)
+chromadb>=0.4.22  # Persistent vector storage
+sentence-transformers>=2.2.2  # all-MiniLM-L6-v2 embeddings (~50MB)
+langchain>=0.1.0  # Orchestration (lightweight)
+langchain-community>=0.0.20  # Community integrations
+numpy>=1.24.0  # For embeddings
+
 # Logging & Monitoring
 structlog==24.1.0
 prometheus-client==0.19.0

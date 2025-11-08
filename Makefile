@@ -51,6 +51,12 @@ test:  ## Run tests
 test-fast:  ## Run tests (no coverage)
 	pytest tests/ -v
 
+test-agi:  ## Test AGI system setup
+	python scripts/test_agi_setup.py
+
+demo-agi:  ## Run AGI system demo
+	python examples/agi_complete_demo.py
+
 clean:  ## Clean build artifacts
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete

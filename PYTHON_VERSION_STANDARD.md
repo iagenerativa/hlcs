@@ -1,20 +1,28 @@
 # Python Version Standard - HLCS & SARAi Ecosystem
 
-**Fecha**: 6 de noviembre de 2025  
-**Versión Estándar**: **Python >=3.12**
+**Fecha**: 7 de noviembre de 2025  
+**Versión Estándar**: **Python >=3.11**
 
 ---
 
 ## 🎯 Decisión de Versión
 
-**Versión mínima requerida**: Python 3.12+
+**Versión mínima requerida**: Python 3.11+
 
 **Razones**:
 
-1. **Consistencia**: Todos los componentes de SARAi AGI usan la misma versión base
-2. **Estabilidad**: Python 3.12 es estable y ampliamente soportado
-3. **Forward compatibility**: Compatible con Python 3.13+ (no-GIL cuando esté disponible)
-4. **Modern features**: Type hints mejorados, mejor performance, seguridad
+1. **Nuevas características requeridas**: 
+   - `list[str]` syntax (sin `from typing import List`)
+   - ExceptionGroups para manejo de errores concurrentes
+   - Mejor soporte para async/await
+   - Performance mejorado (~10-20% más rápido que 3.10)
+   
+2. **Consistencia**: Todos los componentes de SARAi AGI usan la misma versión base
+3. **Estabilidad**: Python 3.11+ es estable y ampliamente soportado
+4. **Forward compatibility**: Compatible con Python 3.12+ y 3.13 (no-GIL cuando esté disponible)
+5. **Modern features**: Type hints mejorados, mejor performance, seguridad
+
+**Recomendado**: Python 3.12+ para mejor rendimiento
 
 ---
 
@@ -31,23 +39,23 @@ FROM python:3.12-slim
 
 ✅ **README.md**:
 ```bash
-# Python 3.12+
+# Python 3.11+ required (3.12+ recommended)
 python --version
 ```
 
 ✅ **QUICKSTART.md**:
 ```bash
-python3.12 -m venv .venv
+python3.11 -m venv .venv  # or python3.12
 ```
 
 ---
 
 ### Propuesta de Modularización (PROPUESTA_MODULARIZACION_SARAI.md)
 
-Todos los módulos actualizados a **Python 3.12+**:
+Todos los módulos actualizados a **Python 3.11+** (3.12+ recomendado):
 
-- ✅ **HLCS**: Python 3.12+ (no-GIL cuando esté disponible)
-- ✅ **SARAi Core**: Python 3.12+ 
+- ✅ **HLCS**: Python 3.11+ (3.12+ recomendado para mejor performance)
+- ✅ **SARAi Core**: Python 3.11+ (3.12+ recomendado) 
 - ✅ **SAUL**: Python 3.12+
 - ✅ **Vision**: Python 3.12+
 - ✅ **Audio**: Python 3.12+

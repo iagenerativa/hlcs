@@ -1,5 +1,5 @@
 # Configuración HLCS (High-Level Consciousness System)
-# Versión: 1.0.0
+# Versión: 3.0.0 (Autonomous Intelligence)
 
 # SARAi MCP Server Configuration
 sarai_mcp:
@@ -30,7 +30,7 @@ sarai_mcp:
 # Agente Configuration
 agent:
   name: "HLCS-Agent"
-  version: "1.0.0"
+  version: "2.0.0"
   
   # Razonamiento
   reasoning:
@@ -44,6 +44,111 @@ agent:
     max_steps: 10
     timeout: 60  # segundos
 
+# AGI System Configuration (NUEVO)
+agi:
+  enabled: true  # Habilitar sistema AGI completo
+  
+  # Modelo local (Phi-4-mini via llama-cpp)
+  model:
+    path: "./models/phi4_mini_q4.gguf"  # Path al modelo GGUF
+    n_ctx: 4096  # Tamaño de contexto
+    n_gpu_layers: -1  # -1 = todas las capas en GPU
+    n_threads: 4  # Threads CPU
+    temperature: 0.2  # Temperatura por defecto
+    max_tokens: 512  # Max tokens por generación
+  
+  # RAG (Retrieval-Augmented Generation)
+  rag:
+    enabled: true
+    
+    # ChromaDB Backend (persistencia)
+    chromadb:
+      persist_dir: "./data/chroma_db"
+      collection_name: "hlcs_knowledge"
+      
+    # Embeddings
+    embedding_model: "all-MiniLM-L6-v2"  # ~50MB, fast queries
+    
+    # Memory Hierarchy
+    memory:
+      stm_ttl_hours: 24  # Short-term memory TTL
+      ltm_promotion_threshold: 3  # Access count for STM → LTM
+      consolidation_interval: 3600  # Run consolidation every hour (seconds)
+    
+    # Retrieval
+    retrieval:
+      top_k: 3  # Top K chunks
+      min_confidence: 0.0  # Minimum confidence filter
+      enable_reranking: true  # Rerank by confidence + recency
+    
+    # Document Loading
+    docs:
+      codebase_path: "./data/codebase.py"
+      chunk_strategy: "function"  # function/paragraph/fixed
+      chunk_size: 500  # For fixed chunking
+      auto_load: false  # Load on startup
+    
+    # Kubernetes/Production
+    kubernetes:
+      persistent_volume: true  # Use PV for ChromaDB
+      pv_claim: "hlcs-chroma-pv"
+      precompute_embeddings: true  # Precompute at startup
+      health_check_interval: 30  # Seconds
+      
+      # Resource limits
+      resources:
+        limits:
+          memory: "512Mi"  # ChromaDB + embeddings
+          cpu: "500m"
+        requests:
+          memory: "256Mi"
+          cpu: "100m"
+  
+  # Memoria Episódica
+  memory:
+    enabled: true
+    max_size: 1000  # Buffer circular size
+    persist_path: "./data/memory/episodes.json"
+    auto_save: true
+    save_interval: 10  # Guardar cada N episodios
+    enable_embeddings: false  # Embeddings para búsqueda semántica
+  
+  # Agente (CodeAgent con tools)
+  agent:
+    enabled: true
+    max_steps: 5  # Máximo pasos ReAct
+    timeout: 30  # Timeout por step
+    
+    # Tools disponibles
+    tools:
+      - search_codebase  # Buscar en código
+      - execute_code  # Ejecutar en sandbox
+      - web_search  # Búsqueda web (Tavily)
+    
+    # Sandbox para ejecución
+    sandbox:
+      type: "firejail"  # o "docker"
+      timeout: 5
+  
+  # Heurística de complejidad
+  complexity:
+    keywords:
+      - create
+      - implement
+      - build
+      - develop
+      - using
+      - and then
+      - step by step
+      - search for
+      - find and
+      - execute
+      - generate code
+      - write a script
+    
+    # Threshold para decidir estrategia
+    threshold: 0.7  # >0.7 = usa agente, <0.7 = usa RAG+LLM
+
 # LangGraph Configuration (si se usa)
 langgraph:
   enabled: false
@@ -53,6 +158,99 @@ langgraph:
 crewai:
   enabled: false
   verbose: true
+
+# Orchestrator Configuration
+orchestrator:
+  complexity_threshold: 0.5  # Threshold para MCP workflows
+  quality_threshold: 0.7
+  max_iterations: 3
+  
+  # Cuándo usar AGI vs MCP workflows
+  use_agi_when:
+    - complexity >= 0.7  # Alta complejidad
+    has_code_keywords: true  # Menciona código
+    not_multimodal: true  # No es imagen/audio
+
+# Meta-Consciousness Layer Configuration (v0.2)
+meta_consciousness:
+  enabled: true  # Habilitar capa meta-cognitiva
+  
+  # Estrategia de decisión
+  strategy: "adaptive"  # conservative, exploratory, balanced, adaptive
+  
+  # Threshold de confianza para decisiones autónomas
+  confidence_threshold: 0.7
+  
+  # Sistema de ignorancia
+  ignorance:
+    enabled: true
+    track_history: true
+    max_history: 100
+  
+  # Conciencia narrativa
+  narrative:
+    enabled: true
+    max_narratives: 10
+    focus: "learning"  # learning, goals, patterns
+
+# Strategic Planning System Configuration (v0.5)
+strategic_planning:
+  enabled: true  # Habilitar planificación estratégica
+  
+  # Gestión de goals
+  goals:
+    max_hierarchy_depth: 5  # Profundidad máxima de jerarquía
+    auto_progress_tracking: true
+    deadline_warnings: true
+  
+  # Ejecución de planes
+  plans:
+    default_decomposition: "sequential"  # sequential, parallel, hybrid
+    auto_retry_failed_steps: true
+    max_retries: 2
+  
+  # Seguimiento de progreso
+  progress:
+    milestone_checking_interval: 300  # segundos
+    auto_achievement_detection: true
+  
+  # Simulación de escenarios
+  scenarios:
+    enabled: true
+    max_simulations_per_decision: 5
+  
+  # Testeo de hipótesis
+  hypotheses:
+    enabled: true
+    auto_testing: false  # Testear hipótesis automáticamente
+    bayesian_update: true  # Actualizar confianza Bayesianamente
+
+# Multi-Stakeholder SCI Configuration (v0.4)
+multi_stakeholder_sci:
+  enabled: true  # Habilitar sistema de consenso
+  
+  # Tipo de consenso
+  consensus_type: "weighted"  # weighted, simple_majority, supermajority, unanimous, adaptive
+  
+  # Timeout para decisiones
+  timeout_minutes: 30.0
+  
+  # Pesos de roles (deben sumar 1.0)
+  role_weights:
+    primary_user: 0.60  # Usuario principal
+    administrator: 0.30  # Administrador del sistema
+    autonomous_agent: 0.10  # Agentes autónomos
+    observer: 0.00  # Observadores sin voto
+  
+  # Auto-voto de agentes
+  agents:
+    auto_vote: true
+    follow_recommendations: true  # Seguir recomendaciones del sistema
+  
+  # Resolución de conflictos
+  conflict_resolution:
+    defer_to_primary: true  # Deferir a usuario principal si no hay consenso
+    fallback: "sarai_mcp"  # Componente por defecto en caso de conflicto
 
 # Monitoreo
 monitoring:
@@ -69,3 +267,4 @@ development:
   debug: true
   reload: false
   mock_sarai: false  # Usar mock en lugar de servidor real
+  mock_agi: false  # Usar mock AGI (cuando llama-cpp no disponible)

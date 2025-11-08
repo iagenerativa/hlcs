@@ -3,7 +3,7 @@ Tests for SARAi MCP Client.
 """
 
 import pytest
-from hlcs.mcp_client import SARAiMCPClient, ToolCallResult
+from src.hlcs.mcp_client import SARAiMCPClient, ToolCallResult
 
 
 @pytest.fixture

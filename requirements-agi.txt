@@ -1,0 +1,52 @@
+# HLCS AGI System - Additional Requirements
+# Install these for full AGI capabilities with Phi-4-mini
+
+# Core AGI dependencies
+llama-cpp-python>=0.2.0  # Phi-4-mini inference via llama.cpp
+sentence-transformers>=2.2.0  # Embeddings for RAG
+numpy>=1.24.0  # Vector operations
+
+# Optional: GPU acceleration (uncomment if using CUDA)
+# llama-cpp-python[cuda]  # CUDA support for llama-cpp
+# torch>=2.0.0  # PyTorch with CUDA
+
+# Optional: Advanced tools
+# tavily-python>=0.3.0  # Web search API
+# docker>=6.0.0  # Docker SDK for code sandbox
+# python-firejail>=0.1.0  # Firejail for code sandbox
+
+# Development
+pytest-asyncio>=0.21.0  # Async testing
+pytest-mock>=3.12.0  # Mocking
+
+# ============================================================================
+# INSTALLATION INSTRUCTIONS
+# ============================================================================
+
+# 1. Basic installation (CPU only)
+# pip install -r requirements-agi.txt
+
+# 2. With CUDA support (recommended for production)
+# CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --force-reinstall --no-cache-dir
+# pip install -r requirements-agi.txt
+
+# 3. Download Phi-4-mini model
+# mkdir -p models
+# wget https://huggingface.co/microsoft/phi-4/resolve/main/phi-4-mini-q4.gguf -O models/phi4_mini_q4.gguf
+
+# 4. Prepare RAG documents
+# mkdir -p data
+# # Copy your codebase to data/codebase.py or similar
+
+# 5. Create memory directory
+# mkdir -p data/memory
+
+# ============================================================================
+# USAGE
+# ============================================================================
+
+# Start HLCS with AGI enabled:
+# python -m src.hlcs.rest_gateway.server
+
+# The system will automatically use AGI for complex queries
+# See config/hlcs.yaml for configuration options

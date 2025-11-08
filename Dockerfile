@@ -1,6 +1,7 @@
 # ============================================================================
 # Stage 1: Builder
 # ============================================================================
+# Using Python 3.12 (recommended). Minimum requirement is 3.11+
 FROM python:3.12-slim as builder
 
 WORKDIR /build
@@ -20,6 +21,7 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 # ============================================================================
 # Stage 2: Runtime
 # ============================================================================
+# Using Python 3.12 (recommended). Minimum requirement is 3.11+
 FROM python:3.12-slim
 
 WORKDIR /app

@@ -1,0 +1,200 @@
+# Kubernetes Deployment for HLCS RAG System
+# Minimalista pod con ChromaDB persistente
+
+---
+# Persistent Volume Claim para ChromaDB
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hlcs-chroma-pv
+  namespace: hlcs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi  # Adjust based on knowledge base size
+  storageClassName: standard  # Use your cluster's storage class
+
+---
+# ConfigMap para configuración RAG
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hlcs-rag-config
+  namespace: hlcs
+data:
+  rag_config.yaml: |
+    chromadb:
+      persist_dir: "/data/chroma_db"
+      collection_name: "hlcs_knowledge"
+    
+    embedding_model: "all-MiniLM-L6-v2"
+    
+    memory:
+      stm_ttl_hours: 24
+      ltm_promotion_threshold: 3
+      consolidation_interval: 3600
+    
+    retrieval:
+      top_k: 3
+      min_confidence: 0.0
+      enable_reranking: true
+
+---
+# Deployment para HLCS con RAG
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hlcs-rag
+  namespace: hlcs
+  labels:
+    app: hlcs
+    component: rag
+spec:
+  replicas: 1  # Single replica para ChromaDB (no multi-writer)
+  selector:
+    matchLabels:
+      app: hlcs
+      component: rag
+  template:
+    metadata:
+      labels:
+        app: hlcs
+        component: rag
+    spec:
+      containers:
+      - name: hlcs-rag
+        image: hlcs:latest
+        imagePullPolicy: IfNotPresent
+        
+        env:
+        - name: HLCS_ENV
+          value: "production"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: RAG_ENABLED
+          value: "true"
+        - name: CHROMADB_PERSIST_DIR
+          value: "/data/chroma_db"
+        
+        ports:
+        - name: rest-api
+          containerPort: 4001
+          protocol: TCP
+        - name: grpc-api
+          containerPort: 4000
+          protocol: TCP
+        
+        volumeMounts:
+        - name: chroma-storage
+          mountPath: /data/chroma_db
+        - name: rag-config
+          mountPath: /app/config/rag_config.yaml
+          subPath: rag_config.yaml
+        
+        resources:
+          limits:
+            memory: "512Mi"  # ChromaDB + embeddings (~50MB) + overhead
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+        
+        # Liveness probe (health check)
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4001
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Readiness probe
+        readinessProbe:
+          httpGet:
+            path: /api/v1/status
+            port: 4001
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Startup probe (for slow initialization)
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 4001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 12  # 60 seconds max
+      
+      volumes:
+      - name: chroma-storage
+        persistentVolumeClaim:
+          claimName: hlcs-chroma-pv
+      - name: rag-config
+        configMap:
+          name: hlcs-rag-config
+      
+      # Security context (run as non-root)
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      
+      # Node selector (optional, for GPU nodes)
+      # nodeSelector:
+      #   accelerator: nvidia-gpu
+
+---
+# Service para exponer HLCS RAG
+apiVersion: v1
+kind: Service
+metadata:
+  name: hlcs-rag-service
+  namespace: hlcs
+spec:
+  selector:
+    app: hlcs
+    component: rag
+  ports:
+  - name: rest-api
+    port: 4001
+    targetPort: 4001
+    protocol: TCP
+  - name: grpc-api
+    port: 4000
+    targetPort: 4000
+    protocol: TCP
+  type: ClusterIP  # Use LoadBalancer for external access
+
+---
+# HorizontalPodAutoscaler (opcional, pero limitado por PVC)
+# NOTA: ChromaDB no soporta multi-writer, usar solo con read replicas
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hlcs-rag-hpa
+  namespace: hlcs
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hlcs-rag
+  minReplicas: 1
+  maxReplicas: 1  # IMPORTANTE: ChromaDB no escala horizontalmente
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

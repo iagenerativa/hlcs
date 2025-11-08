@@ -11,8 +11,8 @@ from unittest.mock import AsyncMock, patch
 @pytest.fixture(autouse=True)
 def mock_dependencies():
     """Mock SARAi client and orchestrator."""
-    with patch('hlcs.rest_gateway.server.SARAiMCPClient') as mock_sarai, \
-         patch('hlcs.rest_gateway.server.HLCSOrchestrator') as mock_orch:
+    with patch('src.hlcs.rest_gateway.server.SARAiMCPClient') as mock_sarai, \
+         patch('src.hlcs.rest_gateway.server.HLCSOrchestrator') as mock_orch:
         
         # Mock SARAi client
         mock_sarai_instance = AsyncMock()
@@ -32,7 +32,7 @@ def mock_dependencies():
 @pytest.fixture
 def client():
     """Create test client."""
-    from hlcs.rest_gateway.server import app
+    from src.hlcs.rest_gateway.server import app
     return TestClient(app)
 
 

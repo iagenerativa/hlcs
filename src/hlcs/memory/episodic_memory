@@ -1,0 +1,25 @@
+# Phi-4 no recuerda entre llamadas. Necesitas un buffer.
+class MemoryBuffer:
+    def __init__(self, max_turns: int = 10):
+        self.turns = []
+        self.max_turns = max_turns
+    
+    def add(self, user_msg: str, assistant_msg: str):
+        self.turns.append({"user": user_msg, "assistant": assistant_msg})
+        if len(self.turns) > self.max_turns:
+            self.turns.pop(0)  # FIFO
+    
+    def get_context(self, current_query: str) -> str:
+        """Devuelve historia relevante, no todo"""
+        # Si la query menciona "anterior" o "previo", incluye últimos turnos
+        if any(word in current_query.lower() for word in ["previous", "before", "anterior", "otra vez"]):
+            return "\n".join([f"User: {t['user']}\nAssistant: {t['assistant']}" for t in self.turns[-3:]])
+        return ""
+
+memory = MemoryBuffer()
+memory.add("Create auth module", "Here's the JWT implementation...")
+memory.add("Now add refresh tokens", "Added refresh token endpoint...")
+
+# En cada llamada:
+context = memory.get_context("Show me the previous auth code")
+# Retorna solo los 2 últimos turnos, no 10.
