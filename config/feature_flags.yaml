@@ -1,0 +1,23 @@
+# HLCS Feature Flags - Migration Phase Control
+# Date: 2025-11-08
+# Status: MIGRATION IN PROGRESS
+
+# Phase 1: Safe Migrations (Day 3-8)
+enable_emotion_system: false
+emotion_integration_meta_consciousness: false
+
+enable_monitoring_system: false
+monitoring_prometheus_metrics: false
+
+# Phase 2: Coexistence (Day 9-14)
+enable_meta_reasoner: false
+meta_reasoner_integration_planning: false
+
+enable_active_learning: false
+active_learning_rag_events: false
+
+# Deferred to v0.4
+enable_lora_training: false  # FEB 2026
+
+# Future merge (v0.4+)
+enable_unified_consciousness: false  # FEB-MAR 2026
